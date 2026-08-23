@@ -160,14 +160,6 @@ body::before{
 .acts button:focus-visible{outline:2px solid var(--buoy);outline-offset:2px}
 
 /* ── how to play ──────────────────────────── */
-details{margin-top:26px;border-top:1px solid var(--rule);padding-top:14px}
-summary{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--chalk-dim);cursor:pointer;list-style:none}
-summary::-webkit-details-marker{display:none}
-summary::before{content:"+ ";color:var(--magenta)}
-details[open] summary::before{content:"– "}
-details p{font-size:13.5px;color:var(--chalk-dim);max-width:52ch}
-details p b{color:var(--chalk);font-weight:500}
 
 @media (max-width:420px){
   .clue{grid-template-columns:86px 1fr;gap:10px}
@@ -176,20 +168,194 @@ details p b{color:var(--chalk);font-weight:500}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
+
+/* ── modals: instructions + stats ──────────────
+   Same vocabulary as the board: mono uppercase labels at 10-10.5px with wide
+   tracking, sans body at 13.5px, chalk on chalk-dim, magenta accent. ── */
+.modal-back{position:fixed;inset:0;z-index:80;background:rgba(4,11,16,.84);
+  backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-back[hidden]{display:none}
+.sheet{position:relative;width:100%;max-width:404px;max-height:100%;
+  display:flex;flex-direction:column;background:var(--shelf);border:1px solid var(--rule);
+  box-shadow:0 22px 60px rgba(0,0,0,.55);animation:rise .2s ease-out}
+.sheet.wide{max-width:460px}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.sheet-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:20px 20px 14px;
+  -webkit-overflow-scrolling:touch}
+.sheet-foot{flex:none;padding:12px 20px 16px;border-top:1px solid var(--rule);background:var(--shelf)}
+.sheet .x{position:absolute;top:6px;right:8px;z-index:2;appearance:none;background:none;border:0;
+  color:var(--chalk-dim);font-family:var(--mono);font-size:18px;line-height:1;padding:6px 9px;cursor:pointer}
+.sheet .x:hover{color:var(--chalk)}
+button.big{width:100%;appearance:none;background:var(--magenta);border:1px solid var(--magenta);
+  color:var(--deep);font-family:var(--mono);font-weight:600;font-size:11px;letter-spacing:.22em;
+  text-transform:uppercase;padding:12px 18px;cursor:pointer;border-radius:0}
+button.big:hover{background:#ee6dac;border-color:#ee6dac}
+button.big:focus-visible,.sheet .x:focus-visible{outline:2px solid var(--buoy);outline-offset:2px}
+
+/* masthead wordmark, reused as the modal title */
+.sheet .mark-lg{font-family:var(--mono);font-weight:600;font-size:15px;letter-spacing:.34em;
+  text-transform:uppercase;color:var(--chalk);text-align:center;margin:0}
+.sheet .mark-lg b{color:var(--magenta);font-weight:600}
+.sheet .kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--chalk-dim);text-align:center;margin:7px 0 16px}
+.sheet p.say{font-size:13.5px;line-height:1.5;color:var(--chalk-dim);margin:0 0 10px}
+.sheet p.say b{color:var(--chalk);font-weight:500}
+
+/* category rows, built like the clue list */
+.cats{border-top:1px solid var(--rule);margin-top:14px}
+.cat{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:start;
+  padding:10px 2px;border-bottom:1px solid rgba(28,57,73,.55)}
+.cat .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--chalk-dim);padding-top:1px}
+.cat.e .k{color:var(--kelp)} .cat.m .k{color:var(--buoy)} .cat.h .k{color:var(--magenta)}
+.cat .v{font-size:13.5px;line-height:1.45;color:var(--chalk-dim)}
+.cat .v b{color:var(--chalk);font-weight:500}
+.dontshow{display:flex;align-items:center;gap:8px;margin:14px 0 0;font-family:var(--mono);
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--chalk-dim);cursor:pointer}
+.dontshow input{accent-color:var(--magenta);width:13px;height:13px;cursor:pointer}
+
+/* ── stats ─────────────────────────────────── */
+.sheet h2.title{margin:0 0 10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--chalk-dim);font-weight:600}
+.streaks{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:0 0 12px}
+.streaks .sc{background:var(--shelf-2);padding:8px 6px;text-align:center;border-top:2px solid var(--rule)}
+.streaks .sc.e{border-top-color:var(--kelp)} .streaks .sc.m{border-top-color:var(--buoy)}
+.streaks .sc.h{border-top-color:var(--magenta)}
+.streaks .sc.on{background:var(--deep)}
+.streaks .lb{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--chalk-dim)}
+.streaks .big-n{font-family:var(--mono);font-weight:700;font-size:24px;line-height:1.1;margin:4px 0 2px;
+  color:var(--chalk);font-variant-numeric:tabular-nums}
+.streaks .sub{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--chalk-dim)}
+.seg{display:flex;margin:0 0 12px;border:1px solid var(--rule)}
+.seg button{flex:1;appearance:none;background:none;border:0;border-right:1px solid var(--rule);
+  color:var(--chalk-dim);font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;padding:8px 4px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--magenta);color:var(--deep);font-weight:600}
+.seg button:focus-visible{outline:2px solid var(--buoy);outline-offset:-2px}
+.sect{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--chalk-dim);margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--rule)}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1px}
+.grid4 div{background:var(--shelf-2);padding:8px 4px;text-align:center;font-family:var(--mono);
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--chalk-dim)}
+.grid4 div b{display:block;font-family:var(--mono);font-weight:700;font-size:17px;letter-spacing:0;
+  text-transform:none;color:var(--chalk);margin-top:3px;font-variant-numeric:tabular-nums}
+
+/* milestone path */
+.path{display:flex;flex-direction:column;gap:1px}
+.ms{display:grid;grid-template-columns:20px 1fr auto;gap:10px;align-items:center;
+  background:var(--shelf-2);padding:6px 11px}
+.ms .dot{width:20px;height:20px;border-radius:50%;border:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;
+  color:var(--chalk-dim)}
+.ms .nm{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--chalk-dim)}
+.ms .when{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--chalk-dim)}
+.ms.done{background:rgba(87,195,154,.11)}
+.ms.done .dot{background:var(--kelp);border-color:var(--kelp);color:var(--deep);font-weight:700}
+.ms.done .nm{color:var(--chalk)}
+.ms.next{background:var(--deep);box-shadow:inset 2px 0 0 var(--magenta)}
+.ms.next .dot{border-color:var(--magenta);color:var(--magenta)}
+.ms.next .nm{color:var(--chalk)}
+.ms.next .when{color:var(--magenta)}
+.bar{grid-column:1/-1;height:2px;background:var(--rule);margin-top:7px}
+.bar i{display:block;height:100%;background:var(--magenta)}
+.beyond{margin-top:8px;padding:9px 11px;background:rgba(224,85,155,.13);
+  border-left:2px solid var(--magenta);font-family:var(--mono);font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--chalk)}
+
+/* histogram + 30-day strip */
+.hist{display:flex;flex-direction:column;gap:2px}
+.hb{display:grid;grid-template-columns:13px 1fr;gap:8px;align-items:center;
+  font-family:var(--mono);font-size:10px;color:var(--chalk-dim)}
+.hb i{display:block;height:14px;background:var(--rule);min-width:22px;position:relative}
+.hb i b{position:absolute;right:5px;top:1px;font-size:9.5px;color:var(--chalk);font-weight:600}
+.hb.today i{background:var(--kelp)} .hb.today i b{color:var(--deep)}
+.hb.fail span:first-child{color:var(--buoy)}
+.dots{display:flex;flex-wrap:wrap;gap:3px}
+.dots i{width:10px;height:10px;background:var(--shelf-2);border:1px solid var(--rule)}
+.dots i.w{background:var(--kelp);border-color:var(--kelp)}
+.dots i.l{background:var(--buoy);border-color:var(--buoy);opacity:.55}
+.legend{margin-top:7px;font-family:var(--mono);font-size:9px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--chalk-dim);display:flex;gap:12px;flex-wrap:wrap}
+.legend b{display:inline-block;width:8px;height:8px;margin-right:5px;vertical-align:-1px}
+
+.iconbtn{appearance:none;background:none;border:1px solid var(--rule);color:var(--chalk-dim);
+  font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  padding:5px 10px;cursor:pointer;border-radius:0}
+.iconbtn:hover{color:var(--chalk);border-color:var(--chalk-dim)}
+.iconbtn:focus-visible{outline:2px solid var(--buoy);outline-offset:2px}
+.mast-right{display:flex;align-items:center;gap:10px}
+
+@media (max-width:560px){
+  .modal-back{padding:14px}
+  .sheet,.sheet.wide{max-width:none}
+  .sheet-body{padding:18px 16px 12px}
+  .sheet-foot{padding:11px 16px calc(13px + env(safe-area-inset-bottom))}
+}
+
+/* ── sidebar ───────────────────────────────────
+   Same vocabulary as the level strip: mono, 11px, wide tracking, uppercase,
+   chalk-dim resting, magenta for the section you are in. ── */
+.mast-left{display:flex;align-items:center;gap:13px}
+.burger{appearance:none;background:none;border:0;padding:4px 2px;cursor:pointer;
+  display:flex;flex-direction:column;justify-content:center;gap:4px;width:22px}
+.burger i{display:block;height:1.5px;width:100%;background:var(--chalk-dim);transition:background .15s}
+.burger:hover i{background:var(--chalk)}
+.burger:focus-visible{outline:2px solid var(--buoy);outline-offset:3px}
+
+.nav-back{position:fixed;inset:0;z-index:90;background:rgba(4,11,16,.72)}
+.nav-back[hidden]{display:none}
+.nav{position:fixed;top:0;left:0;bottom:0;z-index:91;width:232px;max-width:78vw;
+  background:var(--shelf);border-right:1px solid var(--rule);padding:24px 0 20px;
+  display:flex;flex-direction:column;animation:slidein .2s ease-out}
+.nav[hidden]{display:none}
+@keyframes slidein{from{transform:translateX(-100%)}to{transform:none}}
+.nav-mark{font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.34em;
+  text-transform:uppercase;color:var(--chalk);padding:0 20px 18px;
+  border-bottom:1px solid var(--rule);margin-bottom:8px}
+.nav-mark b{color:var(--magenta);font-weight:600}
+.nav-item{appearance:none;background:none;border:0;border-left:2px solid transparent;
+  text-align:left;width:100%;padding:13px 20px;cursor:pointer;
+  font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--chalk-dim)}
+.nav-item:hover{color:var(--chalk);background:rgba(255,255,255,.03)}
+.nav-item[aria-current="true"]{color:var(--chalk);border-left-color:var(--magenta);
+  background:rgba(224,85,155,.09)}
+.nav-item:focus-visible{outline:2px solid var(--buoy);outline-offset:-2px}
+
+/* practice bar */
+.pbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  margin-top:12px;padding:10px 12px;background:var(--shelf);border-left:2px solid var(--buoy)}
+.pbar[hidden]{display:none}
+.ptag{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--chalk-dim)}
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="mast">
-    <div class="mark">Meri<b>d</b>ian</div>
+    <div class="mast-left">
+      <button class="burger" id="burger" aria-label="Open menu"
+              aria-expanded="false" aria-controls="nav"><i></i><i></i><i></i></button>
+      <div class="mark">Meri<b>d</b>ian</div>
+    </div>
     <div class="puzzle-no" id="pno"></div>
   </div>
 
   <div class="strip" id="levels">
     <button data-lv="easy" aria-pressed="true">Capitals</button>
-    <button data-lv="medium" aria-pressed="false">Major cities</button>
-    <button data-lv="hard" aria-pressed="false">Anywhere 1M+</button>
+    <button data-lv="medium" aria-pressed="false">World Cities</button>
+    <button data-lv="hard" aria-pressed="false">Millions</button>
+  </div>
+
+  <div class="pbar" id="pbar" hidden>
+    <span class="ptag">Practice — unlimited, nothing counted</span>
+    <button class="iconbtn" id="newpuz">New puzzle</button>
   </div>
 
   <div class="clockwell">
@@ -216,13 +382,53 @@ details p b{color:var(--chalk);font-weight:500}
   <div class="log" id="log"></div>
   <div id="result"></div>
 
-  <details>
-    <summary>How this works</summary>
-    <p>The clock above shows the <b>real local time</b> in one mystery city. That is your only clue to
-    begin with. Every wrong guess opens the next one — hemisphere, region, population, climate, then a
-    fact about the place. You get <b>six guesses</b>. Each guess also reports the distance and bearing
-    to the target, so you can close in even when you have no idea. Populations are city-proper figures.</p>
-  </details>
+
+  <!-- ── sidebar ─────────────────────────────────────────────── -->
+  <div class="nav-back" id="nav-back" hidden></div>
+  <nav class="nav" id="nav" hidden aria-label="Sections">
+    <div class="nav-mark">Meri<b>d</b>ian</div>
+    <button class="nav-item" data-nav="howto">How to Play</button>
+    <button class="nav-item" data-nav="daily">Game</button>
+    <button class="nav-item" data-nav="practice">Practice</button>
+    <button class="nav-item" data-nav="stats">Stats</button>
+  </nav>
+
+  <!-- ── instructions, shown on every load ───────────────────── -->
+  <div class="modal-back" id="howto-back" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="howto-title" id="howto">
+      <div class="sheet-body">
+        <h2 class="mark-lg" id="howto-title">Meri<b>d</b>ian</h2>
+        <div class="kicker">Guess the city</div>
+        <p class="say">The clock shows the <b>real local time</b> in one mystery city
+          somewhere in the world. That is your first clue.</p>
+        <p class="say"><b>Six guesses.</b> Each wrong guess opens another clue and reports
+          the distance and direction to the answer.</p>
+        <div class="cats">
+          <div class="cat e"><div class="k">Easy</div>
+            <div class="v"><b>Capitals.</b> The national capitals of the world.</div></div>
+          <div class="cat m"><div class="k">Medium</div>
+            <div class="v"><b>World Cities.</b> Capitals, secondary seats, major aviation
+              hubs and world cities.</div></div>
+          <div class="cat h"><div class="k">Hard</div>
+            <div class="v"><b>Millions.</b> Any city with a population over one million.</div></div>
+        </div>
+        <label class="dontshow"><input type="checkbox" id="dontshow"> Don't show this again</label>
+      </div>
+      <div class="sheet-foot"><button class="big" id="howto-play" data-autofocus>Play</button></div>
+    </div>
+  </div>
+
+  <!-- ── stats, streaks and milestones ───────────────────────── -->
+  <div class="modal-back" id="stats-back" hidden>
+    <div class="sheet wide" role="dialog" aria-modal="true" aria-labelledby="stats-title" id="statsheet">
+      <button class="x" id="stats-close" aria-label="Close statistics">&times;</button>
+      <div class="sheet-body">
+        <h2 class="title" id="stats-title">Your standing</h2>
+        <div id="stats-body"></div>
+      </div>
+      <div class="sheet-foot"><button class="big" id="stats-done" data-autofocus>Done</button></div>
+    </div>
+  </div>
 
 </div>
 
@@ -251,7 +457,7 @@ const POOLS = {
                              !(MEDIUM_EXCLUDES_EASY && inTier(c,'easy'))),
   hard:   CITIES.filter(c => inTier(c,'hard'))
 };
-const LEVEL_NAME = {easy:'Capitals', medium:'Major cities', hard:'Anywhere 1M+'};
+const LEVEL_NAME = {easy:'Capitals', medium:'World Cities', hard:'Millions'};
 
 /* ══════════════════════════════════════════════════════════════
    HELPERS
@@ -268,8 +474,10 @@ function flag(cc){
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);
   t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 
-const EPOCH = Date.UTC(2025,0,1);
-function puzzleNumber(){return Math.floor((Date.now()-EPOCH)/864e5)}
+/* Puzzle 1 is 23 August 2026 (UTC). The number rolls at UTC midnight, the
+   same boundary the daily lock and the rotation use. */
+const EPOCH = Date.UTC(2026,7,23);
+function puzzleNumber(){return Math.floor((Date.now()-EPOCH)/864e5)+1}
 
 function localParts(tz, when=new Date()){
   const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:tz,hour12:false,
@@ -304,6 +512,17 @@ function seasonOf(lat, month){ // month 1-12
   const stage=['early','mid','late'][m%3];
   return stage+' '+names[idx];
 }
+/* The last clue. Where a city has a written fact we use it; otherwise we say
+   something true from the record itself — the country and the part of the
+   world it sits in. It never announces that a fact is missing. */
+function factLine(c){
+  if(c.fact) return c.fact;
+  const where = c.region ? ' — ' + c.region + '.' : '.';
+  if(c.tiers && c.tiers.indexOf('easy')>=0)
+    return 'The national capital of ' + c.country + where;
+  return 'A city in ' + c.country + where;
+}
+
 function popText(p){
   if(!p) return 'population not on file';
   if(p<1e6) return 'about '+Math.round(p/1e3)+' thousand people in the city proper';
@@ -458,7 +677,7 @@ const CLUES = [
   {key:'Region', build:c=>c.region+'.'},
   {key:'Population', build:c=>popText(c.pop).replace(/^./,x=>x.toUpperCase())+'.'},
   {key:'Climate', build:c=> c.climate ? c.climate+'.' : 'Not on file for this city yet.'},
-  {key:'One fact', build:c=> c.fact || 'No fact on file yet — but the country is '+c.country+'.'}
+  {key:'One fact', build:c=> factLine(c)}
 ];
 const MAX_GUESSES = 6;
 
@@ -466,8 +685,9 @@ const MAX_GUESSES = 6;
    STATE
    ══════════════════════════════════════════════════════════════ */
 let level='easy', target=null, guesses=[], over=false, acIndex=-1, acList=[];
-/* practice rounds never touch daily state, stats or streaks */
-let practice=false;
+/* 'daily' is the dated puzzle; 'practice' is unlimited and writes nothing.
+   `practice` stays as the flag the rest of the code already checks. */
+let mode='daily', practice=false;
 
 /* Daily answer. The rotation for each tier is frozen in cities.js
    (window.MERIDIAN_ORDER), so a rebuild of the dataset cannot change which
@@ -500,7 +720,37 @@ function addGuess(city){
   return hit;
 }
 
+/* today's three answers, so practice can't be used to farm the daily */
+function setMode(m){
+  if(STATE.prefs){ STATE.prefs.tab=m; saveState(); }
+  $('#pbar').hidden = (m!=='practice');
+  [...document.querySelectorAll('.nav-item')].forEach(b=>
+    b.setAttribute('aria-current', String(b.dataset.nav===m)));
+  if(m==='practice') startPractice(); else startRound();
+}
+
+function dailyAnswerIds(){
+  const out=new Set(), n=puzzleNumber();
+  for(const t of TIERS){
+    const seq=rotationFor(t);
+    if(seq.length) out.add(seq[((n % seq.length)+seq.length)%seq.length]);
+  }
+  return out;
+}
+
+function startPractice(){
+  mode='practice'; practice=true; guesses=[]; over=false;
+  const skip=dailyAnswerIds();
+  const pool=POOLS[level].filter(c=>!skip.has(c.id));
+  target = pool.length ? pool[Math.floor(Math.random()*pool.length)] : null;
+  $('#result').innerHTML=''; $('#log').innerHTML=''; $('#note').textContent='';
+  $('#play').hidden=false; $('#guess').value=''; hideAC();
+  $('#pno').textContent='Practice · '+LEVEL_NAME[level];
+  renderClues(); tick();
+}
+
 function startRound(){
+  mode='daily'; 
   target=pickTarget(); guesses=[]; over=false; practice=false;
   $('#result').innerHTML=''; $('#log').innerHTML=''; $('#note').textContent='';
   $('#play').hidden=false; $('#guess').value=''; hideAC();
@@ -621,11 +871,13 @@ function finish(won, restoring){
   over=true; $('#play').hidden=true;
   renderClues(); tick();
 
+  let earned = [];
   if(!practice && !restoring){
     const rec = dayRec(level, true);
     rec.status = won ? 'won' : 'lost';
     rec.finishedAt = Date.now();
     recordResult(level, won, guesses.length);
+    earned = awardBadges(level);        // milestones reached by this result
     saveState();
   }
 
@@ -640,7 +892,7 @@ function finish(won, restoring){
     <div class="verdict">${won?'Found it in '+guesses.length+(guesses.length===1?' guess':' guesses'):'Out of guesses. It was'}</div>
     <h2 class="city">${target.name}</h2>
     <div class="country">${flag(target.cc)} ${target.country} · ${p.hour}:${p.minute} local</div>
-    <p class="fact">${target.fact || ''}</p>
+    <p class="fact">${factLine(target)}</p>
     <div class="stats">
       <div>Played<b>${played}</b></div>
       <div>Win rate<b>${played?Math.round(st.won/played*100):0}%</b></div>
@@ -650,7 +902,7 @@ function finish(won, restoring){
     ${lockNote}
     <div class="acts">
       <button class="primary" id="share">Copy result</button>
-      <button id="again">Practice a random city</button>
+      <button id="again">${practice?'New puzzle':'Practice'}</button>
     </div></div>`;
 
   $('#share').onclick=async e=>{
@@ -658,22 +910,196 @@ function finish(won, restoring){
     const head = practice
       ? `Meridian practice · ${LEVEL_NAME[level]}`
       : `Meridian No.${puzzleNumber()} · ${LEVEL_NAME[level]}`;
-    const txt=`${head}\n${won?guesses.length:'X'}/${MAX_GUESSES} ${grid}`;
+    const badge = earned.length ? `\n★ ${earned[earned.length-1].name} — ${streakFor(level)}-day streak` : '';
+    const txt=`${head}\n${won?guesses.length:'X'}/${MAX_GUESSES} ${grid}${badge}`;
     try{ await navigator.clipboard.writeText(txt); }catch(err){
       const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta);
       ta.select(); document.execCommand('copy'); ta.remove();
     }
     e.target.textContent='Copied'; setTimeout(()=>e.target.textContent='Copy result',1600);
   };
+  /* the standings pop up every time a daily game ends */
+  if(!practice && !restoring) setTimeout(()=>openStats(level), 420);
+
   $('#again').onclick=()=>{
-    /* practice: unlimited, and it writes nothing anywhere */
-    practice=true;
-    const pool=POOLS[level];
-    target=pool[Math.floor(Math.random()*pool.length)];
-    guesses=[]; over=false;
-    $('#result').innerHTML=''; $('#log').innerHTML=''; $('#play').hidden=false;
-    $('#guess').value=''; renderClues(); tick(); $('#guess').focus();
+    setMode('practice');
+    $('#guess').focus();
   };
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   INSTRUCTIONS + STATS MODALS
+   ══════════════════════════════════════════════════════════════ */
+
+/* Flip to false to honour the "don't show this again" preference. */
+const ALWAYS_SHOW_INSTRUCTIONS = true;
+
+const MILESTONES = [
+  {days:7,  name:'Waypoint'},
+  {days:10, name:'Trade Winds'},
+  {days:15, name:'Meridian Passage'},
+  {days:30, name:'Circumnavigator'},
+  {days:45, name:'Cartographer Royal'},
+  {days:60, name:'Prime Meridian'}
+];
+
+/* Award any milestone the streak has reached, keeping the date it was earned.
+   Badges are never removed: a broken streak resets the count, not the history. */
+function awardBadges(lv){
+  const st=STATE.stats[lv]; st.badges=st.badges||{};
+  const n=streakFor(lv), fresh=[];
+  for(const m of MILESTONES){
+    if(n>=m.days && !st.badges[m.days]){ st.badges[m.days]=utcDay(); fresh.push(m); }
+  }
+  return fresh;
+}
+
+/* ── generic modal plumbing: focus trap, Esc, click-outside ── */
+let lastFocus=null, trapHandler=null;
+const FOCUSABLE='button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])';
+
+function openModal(backId){
+  const back=document.getElementById(backId);
+  if(!back.hidden) return;
+  lastFocus=document.activeElement;
+  back.hidden=false;
+  const sheet=back.querySelector('.sheet');
+  const items=()=>[...sheet.querySelectorAll(FOCUSABLE)].filter(e=>e.offsetParent!==null);
+  const start=sheet.querySelector('[data-autofocus]')||items()[0];
+  if(start) start.focus();
+  trapHandler=e=>{
+    if(e.key==='Escape'){ e.preventDefault(); closeModal(backId); return; }
+    if(e.key!=='Tab') return;
+    const f=items(); if(!f.length) return;
+    const a=f[0], z=f[f.length-1];
+    if(e.shiftKey && document.activeElement===a){ e.preventDefault(); z.focus(); }
+    else if(!e.shiftKey && document.activeElement===z){ e.preventDefault(); a.focus(); }
+  };
+  document.addEventListener('keydown',trapHandler,true);
+  back.__click=e=>{ if(e.target===back) closeModal(backId); };
+  back.addEventListener('mousedown',back.__click);
+}
+
+function closeModal(backId){
+  const back=document.getElementById(backId);
+  if(back.hidden) return;
+  back.hidden=true;
+  if(trapHandler){ document.removeEventListener('keydown',trapHandler,true); trapHandler=null; }
+  if(back.__click){ back.removeEventListener('mousedown',back.__click); back.__click=null; }
+  /* focus goes back to the board */
+  const g=$('#guess');
+  if(g && !$('#play').hidden) g.focus();
+  else if(lastFocus && lastFocus.focus) lastFocus.focus();
+}
+
+/* ── stats rendering ───────────────────────────────────────── */
+let statsTier='easy';
+
+function tierSummary(lv){
+  const st=STATE.stats[lv];
+  const solved=Object.entries(st.dist||{}).reduce((a,[k,v])=>a+ (+k)*v, 0);
+  const wins=Object.values(st.dist||{}).reduce((a,v)=>a+v,0);
+  return {
+    played:st.played|0, won:st.won|0,
+    pct: st.played ? Math.round(st.won/st.played*100) : 0,
+    streak: streakFor(lv), best: st.maxStreak|0,
+    avg: wins ? (solved/wins).toFixed(2) : '—'
+  };
+}
+
+function renderStats(){
+  const today=utcDay();
+  const cards=TIERS.map(lv=>{
+    const s=tierSummary(lv);
+    return `<div class="sc ${lv[0]} ${lv===statsTier?'on':''}">
+      <div class="lb">${LEVEL_NAME[lv]}</div>
+      <div class="big-n">${s.streak}</div>
+      <div class="sub">best ${s.best}</div></div>`;
+  }).join('');
+
+  const tabs=TIERS.map(lv=>
+    `<button data-st="${lv}" aria-pressed="${lv===statsTier}">${lv}</button>`).join('');
+
+  const s=tierSummary(statsTier);
+  const st=STATE.stats[statsTier];
+  const badges=st.badges||{};
+  const streak=s.streak;
+
+  /* milestone path */
+  const next=MILESTONES.find(m=>streak<m.days);
+  const path=MILESTONES.map(m=>{
+    const done=!!badges[m.days] || streak>=m.days;
+    const isNext=next && m.days===next.days;
+    const pct=isNext?Math.max(2,Math.round(streak/m.days*100)):0;
+    const right=done?(badges[m.days]?`earned ${badges[m.days]}`:'earned')
+              :isNext?`${m.days-streak} day${m.days-streak===1?'':'s'} to go`
+              :`${m.days} days`;
+    return `<div class="ms ${done?'done':''} ${isNext?'next':''}">
+      <div class="dot">${done?'✓':m.days}</div>
+      <div class="nm">${m.name}</div>
+      <div class="when">${right}</div>
+      ${isNext?`<div class="bar"><i style="width:${pct}%"></i></div>`:''}
+    </div>`;
+  }).join('');
+  const beyond = streak>=60
+    ? `<div class="beyond">Prime Meridian +${streak-60}</div>` : '';
+
+  /* guess distribution */
+  const dist=st.dist||{};
+  const counts=[1,2,3,4,5,6].map(k=>dist[k]|0);
+  const max=Math.max(1,...counts,st.fails|0);
+  const todayRec=(STATE.daily[today]||{})[statsTier];
+  const todayTries=todayRec&&todayRec.status==='won'?todayRec.guesses.length:null;
+  const todayFail=todayRec&&todayRec.status==='lost';
+  const hist=[1,2,3,4,5,6].map(k=>{
+    const v=dist[k]|0, hl=todayTries===k;
+    return `<div class="hb ${hl?'today':''}"><span>${k}</span>
+      <i style="width:${Math.max(8,Math.round(v/max*100))}%"><b>${v}</b></i></div>`;
+  }).join('')+
+  `<div class="hb fail ${todayFail?'today':''}"><span>X</span>
+     <i style="width:${Math.max(8,Math.round((st.fails|0)/max*100))}%"><b>${st.fails|0}</b></i></div>`;
+
+  /* last 30 days */
+  let d=today, dots='';
+  const strip=[];
+  for(let i=0;i<30;i++){ strip.unshift(d); d=dayBefore(d); }
+  dots=strip.map(day=>{
+    const r=(st.results||{})[day];
+    return `<i class="${r==='w'?'w':r==='l'?'l':''}" title="${day}"></i>`;
+  }).join('');
+
+  $('#stats-body').innerHTML=`
+    <div class="streaks">${cards}</div>
+    <div class="seg" id="stats-tabs">${tabs}</div>
+    <div class="grid4">
+      <div>Played<b>${s.played}</b></div>
+      <div>Won<b>${s.won}</b></div>
+      <div>Win %<b>${s.pct}</b></div>
+      <div>Avg guess<b>${s.avg}</b></div>
+    </div>
+    <div class="sect">Streak milestones — ${LEVEL_NAME[statsTier]}</div>
+    <div class="path">${path}</div>${beyond}
+    <div class="sect">Guess distribution</div>
+    <div class="hist">${hist}</div>
+    <div class="sect">Last 30 days</div>
+    <div class="dots">${dots}</div>
+    <div class="legend">
+      <span><b style="background:var(--kelp)"></b>Won</span>
+      <span><b style="background:var(--buoy);opacity:.55"></b>Lost</span>
+      <span><b style="background:var(--shelf-2);border:1px solid var(--rule)"></b>Not played</span>
+    </div>`;
+
+  $('#stats-tabs').onclick=e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    statsTier=b.dataset.st; renderStats();
+  };
+}
+
+function openStats(tier){
+  statsTier=tier||level;
+  renderStats();
+  openModal('stats-back');
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -684,7 +1110,8 @@ $('#ticks').innerHTML=$('#ticks2').innerHTML=Array(13).fill('<i></i>').join('');
 $('#levels').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b) return;
   [...$('#levels').children].forEach(x=>x.setAttribute('aria-pressed', x===b));
-  level=b.dataset.lv; startRound(); 
+  level=b.dataset.lv;
+  if(mode==='practice') startPractice(); else startRound();
 });
 
 const inp=$('#guess');
@@ -704,9 +1131,53 @@ $('#ac').addEventListener('mousedown',e=>{
 inp.addEventListener('blur',()=>setTimeout(hideAC,120));
 $('#submit').addEventListener('click',submit);
 
-/* The clock must not wait on storage, so start it first, then restore. */
+/* sidebar */
+function openNav(){
+  $('#nav').hidden=false; $('#nav-back').hidden=false;
+  $('#burger').setAttribute('aria-expanded','true');
+  const f=$('#nav').querySelector('.nav-item'); if(f) f.focus();
+  document.addEventListener('keydown',navKey,true);
+}
+function closeNav(){
+  $('#nav').hidden=true; $('#nav-back').hidden=true;
+  $('#burger').setAttribute('aria-expanded','false');
+  document.removeEventListener('keydown',navKey,true);
+}
+function navKey(e){ if(e.key==='Escape'){ e.preventDefault(); closeNav(); $('#burger').focus(); } }
+
+$('#burger').addEventListener('click',()=> $('#nav').hidden ? openNav() : closeNav());
+$('#nav-back').addEventListener('click',closeNav);
+$('#nav').addEventListener('click',e=>{
+  const b=e.target.closest('[data-nav]'); if(!b) return;
+  const k=b.dataset.nav;
+  closeNav();
+  if(k==='howto') openModal('howto-back');
+  else if(k==='stats') openStats(level);
+  else setMode(k);
+});
+$('#newpuz').addEventListener('click',()=>{ startPractice(); $('#guess').focus(); });
+$('#stats-close').addEventListener('click',()=>closeModal('stats-back'));
+$('#stats-done').addEventListener('click',()=>closeModal('stats-back'));
+$('#howto-play').addEventListener('click',()=>{
+  const cb=$('#dontshow');
+  if(cb && STATE.prefs){ STATE.prefs.hideInstructions=cb.checked; saveState(); }
+  closeModal('howto-back');
+});
+
+/* The clock must not wait on storage, and neither must the instructions:
+   open them straight away, then load state and build the board underneath. */
 setInterval(tick,1000);
-loadState().then(()=>{ startRound(); }).catch(()=>{ startRound(); });
+if(ALWAYS_SHOW_INSTRUCTIONS) openModal('howto-back');
+
+loadState().then(()=>{
+  TIERS.forEach(awardBadges);          // backfill any milestone already reached
+  saveState();
+  const cb=$('#dontshow');
+  if(cb) cb.checked=!!(STATE.prefs && STATE.prefs.hideInstructions);
+  if(!ALWAYS_SHOW_INSTRUCTIONS && !(STATE.prefs && STATE.prefs.hideInstructions))
+    openModal('howto-back');
+  setMode((STATE.prefs && STATE.prefs.tab==='practice') ? 'practice' : 'daily');
+}).catch(()=>{ setMode('daily'); });
 </script>
 </body>
 </html>
