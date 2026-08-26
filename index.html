@@ -4,6 +4,29 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Meridian — guess the city from its clock</title>
+<meta name="description" content="A daily geography puzzle. The clock shows the real local time in one mystery city — six guesses, and every wrong one opens another clue.">
+<meta name="theme-color" content="#08161f">
+<link rel="canonical" href="https://soundrathor.github.io/meridian/">
+
+<!-- Share card. og:image must stay an absolute URL: most platforms will not
+     resolve a relative one. Update https://soundrathor.github.io/meridian/ here and in og:url if the site moves
+     to a custom domain. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Meridian">
+<meta property="og:title" content="Meridian — guess the city from its clock">
+<meta property="og:description" content="A daily geography puzzle. The clock shows the real local time in one mystery city — six guesses, and every wrong one opens another clue.">
+<meta property="og:url" content="https://soundrathor.github.io/meridian/">
+<meta property="og:image" content="https://soundrathor.github.io/meridian/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A large clock face reading 4:27 PM above the words: guess the city from its clock.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Meridian — guess the city from its clock">
+<meta name="twitter:description" content="A daily geography puzzle. The clock shows the real local time in one mystery city — six guesses, and every wrong one opens another clue.">
+<meta name="twitter:image" content="https://soundrathor.github.io/meridian/assets/og-image.png">
+
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
@@ -391,6 +414,7 @@ button.big:focus-visible,.sheet .x:focus-visible{outline:2px solid var(--buoy);o
     <button class="nav-item" data-nav="daily">Game</button>
     <button class="nav-item" data-nav="practice">Practice</button>
     <button class="nav-item" data-nav="stats">Stats</button>
+    <a class="nav-item" href="privacy.html" style="display:block;text-decoration:none">Privacy</a>
   </nav>
 
   <!-- ── instructions, shown on every load ───────────────────── -->
@@ -432,7 +456,7 @@ button.big:focus-visible,.sheet .x:focus-visible{outline:2px solid var(--buoy);o
 
 </div>
 
-<script src="cities.js"></script>
+<script src="cities.js?v=2026-08-26-8e05e325"></script>
 <script>
 /* ══════════════════════════════════════════════════════════
    DATA — the city list lives in cities.js (window.MERIDIAN_CITIES),
@@ -447,7 +471,8 @@ const MEDIUM_EXCLUDES_EASY = false;
 const CITIES = (window.MERIDIAN_CITIES || []).map(c => ({
   id: c.id, name: c.name, country: c.country, cc: c.countryCode, tz: c.tz,
   lat: c.lat, lon: c.lng, pop: c.population, region: c.region,
-  climate: c.climateLabel, fact: c.fact, tiers: c.tiers, alt: c.aliases || []
+  climate: c.climateLabel, fact: c.fact, tiers: c.tiers, alt: c.aliases || [],
+  languages: c.languages || []
 }));
 
 const inTier = (c, t) => c.tiers.indexOf(t) >= 0;
@@ -521,13 +546,6 @@ function factLine(c){
   if(c.tiers && c.tiers.indexOf('easy')>=0)
     return 'The national capital of ' + c.country + where;
   return 'A city in ' + c.country + where;
-}
-
-function popText(p){
-  if(!p) return 'population not on file';
-  if(p<1e6) return 'about '+Math.round(p/1e3)+' thousand people in the city proper';
-  if(p<2e6) return 'roughly '+(p/1e6).toFixed(1)+' million in the city proper';
-  return 'roughly '+Math.round(p/1e6)+' million in the city proper';
 }
 
 /* Persistence, in order of preference:
@@ -675,8 +693,10 @@ const CLUES = [
         : ' — but deep in the tropics, so the year is measured in rain, not seasons.');
   }},
   {key:'Region', build:c=>c.region+'.'},
-  {key:'Population', build:c=>popText(c.pop).replace(/^./,x=>x.toUpperCase())+'.'},
   {key:'Climate', build:c=> c.climate ? c.climate+'.' : 'Not on file for this city yet.'},
+  {key:'Primary Language(s)', build:c=> c.languages && c.languages.length
+      ? c.languages.join(' and ')+'.'
+      : 'Not on file for this city yet.'},
   {key:'One fact', build:c=> factLine(c)}
 ];
 const MAX_GUESSES = 6;
@@ -932,8 +952,9 @@ function finish(won, restoring){
    INSTRUCTIONS + STATS MODALS
    ══════════════════════════════════════════════════════════════ */
 
-/* Flip to false to honour the "don't show this again" preference. */
-const ALWAYS_SHOW_INSTRUCTIONS = true;
+/* Set true to force the instructions open on every load, which is handy while
+   editing them. Left false so the "don't show this again" preference is honoured. */
+const ALWAYS_SHOW_INSTRUCTIONS = false;
 
 const MILESTONES = [
   {days:7,  name:'Waypoint'},
@@ -1164,17 +1185,32 @@ $('#howto-play').addEventListener('click',()=>{
   closeModal('howto-back');
 });
 
-/* The clock must not wait on storage, and neither must the instructions:
-   open them straight away, then load state and build the board underneath. */
+/* The clock must not wait on storage, and neither must the instructions.
+   loadState is async, so waiting for it would flash the board before the sheet.
+   Peek at localStorage synchronously instead: a first-time visitor gets the
+   sheet immediately, and anyone who ticked the box never sees it at all.
+   Returns null when localStorage itself is unreadable (Safari private mode),
+   in which case the async path below decides. */
+function instructionsHiddenSync(){
+  try{
+    const raw = localStorage.getItem(STATE_KEY);
+    if(!raw) return false;
+    return !!((JSON.parse(raw) || {}).prefs || {}).hideInstructions;
+  }catch(e){ return null; }
+}
+
 setInterval(tick,1000);
-if(ALWAYS_SHOW_INSTRUCTIONS) openModal('howto-back');
+const introHidden = instructionsHiddenSync();
+if(ALWAYS_SHOW_INSTRUCTIONS || introHidden === false) openModal('howto-back');
 
 loadState().then(()=>{
   TIERS.forEach(awardBadges);          // backfill any milestone already reached
   saveState();
   const cb=$('#dontshow');
   if(cb) cb.checked=!!(STATE.prefs && STATE.prefs.hideInstructions);
-  if(!ALWAYS_SHOW_INSTRUCTIONS && !(STATE.prefs && STATE.prefs.hideInstructions))
+  // only when the sync peek could not answer; otherwise it already decided
+  if(!ALWAYS_SHOW_INSTRUCTIONS && introHidden === null &&
+     !(STATE.prefs && STATE.prefs.hideInstructions))
     openModal('howto-back');
   setMode((STATE.prefs && STATE.prefs.tab==='practice') ? 'practice' : 'daily');
 }).catch(()=>{ setMode('daily'); });
