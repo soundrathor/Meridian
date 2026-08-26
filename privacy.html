@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meridian — privacy</title>
+<meta name="description" content="What Meridian stores, where it stores it, and what it does not collect.">
+<meta name="theme-color" content="#08161f">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>
+:root{--deep:#08161f;--shelf:#0e2130;--chalk:#e9e4d6;--chalk-dim:#8ba3b3;
+  --rule:#1c3949;--magenta:#e0559b;--buoy:#f0a24b;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --sans:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --serif:"Instrument Serif",Georgia,serif}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--deep);color:var(--chalk);font-family:var(--sans);
+  font-size:15px;line-height:1.6;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background:radial-gradient(120% 80% at 50% -10%,rgba(224,85,155,.10),transparent 60%),
+    repeating-linear-gradient(0deg,rgba(28,57,73,.30) 0 1px,transparent 1px 64px)}
+.wrap{position:relative;max-width:640px;margin:0 auto;padding:0 18px 80px}
+.mast{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:22px 0 12px;border-bottom:1px solid var(--rule)}
+.mark{font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.34em;
+  text-transform:uppercase;color:var(--chalk);text-decoration:none}
+.mark b{color:var(--magenta);font-weight:600}
+.back{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--chalk-dim);text-decoration:none}
+.back:hover{color:var(--magenta)}
+h1{font-family:var(--serif);font-size:clamp(30px,8vw,40px);font-weight:400;margin:34px 0 6px}
+.updated{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--chalk-dim);margin-bottom:30px}
+h2{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--chalk-dim);font-weight:500;margin:32px 0 10px}
+p{margin:0 0 14px;color:var(--chalk)}
+ul{margin:0 0 14px;padding-left:20px;color:var(--chalk)}
+li{margin-bottom:7px}
+code{font-family:var(--mono);font-size:13px;color:var(--buoy);
+  background:var(--shelf);padding:1px 5px;border:1px solid var(--rule)}
+.callout{border-left:2px solid var(--kelp,#57c39a);background:rgba(87,195,154,.07);
+  padding:14px 16px;margin:0 0 18px}
+.callout p{margin:0}
+a{color:var(--magenta)}
+footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--chalk-dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="mast">
+    <a class="mark" href="/">Meri<b>d</b>ian</a>
+    <a class="back" href="/">← Back to the game</a>
+  </div>
+
+  <h1>Privacy</h1>
+  <div class="updated">Last updated 26 August 2026</div>
+
+  <div class="callout">
+    <p>Meridian has no accounts, no logins, and no server of its own. Your game
+    data never leaves your browser.</p>
+  </div>
+
+  <h2>What is stored, and where</h2>
+  <p>The game keeps your progress in your own browser, using
+  <code>localStorage</code>. Nothing is transmitted anywhere. Clearing your
+  browser's site data erases all of it permanently, and there is no copy to
+  restore from.</p>
+  <p>Under the key <code>meridian.v2.state</code> it stores:</p>
+  <ul>
+    <li>Today's board for each difficulty — your guesses so far and whether the
+      round is finished. This is what lets a refresh restore the game rather
+      than lose it, and what keeps a finished round finished.</li>
+    <li>Per-difficulty statistics: games played and won, streaks, your best
+      streak, the spread of how many guesses you needed, and which milestones
+      you have reached.</li>
+    <li>Preferences: your last-used tab, and whether you asked the instructions
+      not to show again.</li>
+    <li>Results from the last 90 days, so the calendar strip can be drawn.
+      Older days are pruned automatically.</li>
+  </ul>
+  <p>A key from an earlier version, <code>meridian:&lt;difficulty&gt;</code>,
+  may also be present. It holds only old statistics and is read once so your
+  history carries over.</p>
+
+  <h2>What is not collected</h2>
+  <ul>
+    <li>No account, email address, or name.</li>
+    <li>No analytics, tracking pixels, advertising, or third-party scripts.</li>
+    <li>No cookies. The game sets none.</li>
+    <li>No location data. Your time zone is read from your device to show your
+      own clock beside the puzzle's, and that reading stays on the page.</li>
+    <li>Nothing is sent to any server. There is no server to send it to.</li>
+  </ul>
+
+  <h2>Things outside our control</h2>
+  <p>Two requests do leave your browser, and each is governed by that provider's
+  own privacy policy rather than this one:</p>
+  <ul>
+    <li>Typefaces load from <a href="https://policies.google.com/privacy">Google
+      Fonts</a>. The game works without them, falling back to your system fonts.</li>
+    <li>The site is hosted on GitHub Pages, which records standard server logs
+      including IP addresses. See
+      <a href="https://docs.github.com/site-policy/privacy-policies/github-privacy-statement">GitHub's
+      privacy statement</a>.</li>
+  </ul>
+
+  <h2>Sharing your result</h2>
+  <p>The share button copies a short text summary to your clipboard. Nothing is
+  posted anywhere. Where it goes next is entirely up to you.</p>
+
+  <h2>Children</h2>
+  <p>The game collects no personal information from anyone, of any age.</p>
+
+  <h2>Changes</h2>
+  <p>If this policy changes, the date above changes with it. Should analytics or
+  advertising ever be added, this page will say so before they go live.</p>
+
+  <h2>Contact</h2>
+  <!-- TODO: put a real contact address here before going live. An ad network or
+       app store will reject a privacy policy without one. -->
+  <p>Questions about this policy can go to
+  <a href="mailto:hello@example.com">hello@example.com</a>.</p>
+
+  <footer>Meridian — a daily geography puzzle</footer>
+
+</div>
+</body>
+</html>

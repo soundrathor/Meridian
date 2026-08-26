@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meridian — nothing at these coordinates</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#08161f">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>
+:root{--deep:#08161f;--chalk:#e9e4d6;--chalk-dim:#8ba3b3;--rule:#1c3949;
+  --magenta:#e0559b;--buoy:#f0a24b;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --sans:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --serif:"Instrument Serif",Georgia,serif}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--deep);color:var(--chalk);font-family:var(--sans);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background:radial-gradient(120% 80% at 50% -10%,rgba(224,85,155,.10),transparent 60%),
+    repeating-linear-gradient(0deg,rgba(28,57,73,.30) 0 1px,transparent 1px 64px)}
+.box{position:relative;text-align:center;max-width:460px}
+.mark{font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.34em;
+  text-transform:uppercase;margin-bottom:36px}
+.mark b{color:var(--magenta);font-weight:600}
+.code{font-family:var(--mono);font-weight:600;font-size:clamp(58px,17vw,88px);
+  line-height:1;letter-spacing:-.03em;color:var(--buoy);font-variant-numeric:tabular-nums}
+h1{font-family:var(--serif);font-size:clamp(26px,7vw,34px);font-weight:400;margin:18px 0 10px}
+p{color:var(--chalk-dim);font-size:14.5px;line-height:1.6;margin:0 0 30px}
+a.btn{display:inline-block;text-decoration:none;background:none;border:1px solid var(--rule);
+  color:var(--chalk);font-family:var(--mono);font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;padding:13px 22px}
+a.btn:hover{border-color:var(--magenta);color:var(--magenta)}
+a.btn:focus-visible{outline:2px solid var(--buoy);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="mark">Meri<b>d</b>ian</div>
+    <div class="code">404</div>
+    <h1>Nothing at these coordinates.</h1>
+    <p>That page does not exist. The clock is still running somewhere, though.</p>
+    <a class="btn" href="/">Back to the puzzle</a>
+  </div>
+</body>
+</html>
